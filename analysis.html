@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analiz Sonuçları - ReviewAnalyzer Pro</title>
+    <meta name="description" content="Detaylı yorum analizi sonuçları ve profesyonel rapor">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- ECharts for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366F1;
+            --secondary: #8B5CF6;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --text: #F8FAFC;
+            --text-secondary: #CBD5E1;
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .report-card {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+        
+        .sentiment-positive { color: #10B981; }
+        .sentiment-neutral { color: #6B7280; }
+        .sentiment-negative { color: #EF4444; }
+        .sentiment-suspicious { color: #F59E0B; }
+        
+        .expandable-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .expandable-card.expanded {
+            transform: scale(1.02);
+        }
+        
+        .card-content {
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .card-content.expanded {
+            max-height: 1000px;
+        }
+        
+        .rating-stars {
+            color: #F59E0B;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .glass-card, .report-card { background: white !important; border: 1px solid #ccc !important; }
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Geri Dön</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="export-pdf" class="btn-primary px-4 py-2 rounded-lg text-white font-medium text-sm">
+                        <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        PDF İndir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Report Header -->
+    <section class="pt-24 pb-12 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4">
+                    <span class="gradient-text">Analiz Raporu</span>
+                </h1>
+                <p class="text-xl text-slate-300" id="report-domain">example.com</p>
+                <p class="text-sm text-slate-400 mt-2" id="report-date">Analiz Tarihi: 10.11.2024</p>
+            </div>
+            
+            <!-- Overall Score -->
+            <div class="glass-card rounded-2xl p-8 text-center mb-8">
+                <div class="flex items-center justify-center space-x-8">
+                    <div>
+                        <div class="text-5xl font-bold gradient-text mb-2" id="overall-score">4.2</div>
+                        <div class="text-slate-300">Genel Puan</div>
+                    </div>
+                    <div class="h-16 w-px bg-slate-600"></div>
+                    <div>
+                        <div class="text-3xl font-bold text-indigo-400 mb-2" id="total-comments">1,247</div>
+                        <div class="text-slate-300">Toplam Yorum</div>
+                    </div>
+                    <div class="h-16 w-px bg-slate-600"></div>
+                    <div>
+                        <div class="text-3xl font-bold text-green-400 mb-2" id="positive-rate">73%</div>
+                        <div class="text-slate-300">Pozitif Oranı</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="pb-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                
+                <!-- Left Column - Key Metrics -->
+                <div class="space-y-6">
+                    <!-- Summary Card -->
+                    <div class="report-card rounded-2xl p-6 expandable-card" data-card="summary">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Özet</h3>
+                            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <p class="text-slate-300 leading-relaxed" id="summary-text">
+                                İşletmeniz genel olarak olumlu bir izlenim bırakıyor. %73 oranında pozitif yorum almışsınız. 
+                                En dikkat çeken konular kargo süresi ve müşteri hizmetleri kalitesi. Şüpheli yorum oranı 
+                                düşük seviyede ancak düzenli takip öneriliyor.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Critical Issues -->
+                    <div class="report-card rounded-2xl p-6 expandable-card" data-card="issues">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Kritik Sorunlar</h3>
+                            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <div class="space-y-3" id="critical-issues">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-2 h-2 bg-red-400 rounded-full mt-2"></div>
+                                    <div>
+                                        <div class="font-medium text-red-400">Kargo Süresi Şikayetleri</div>
+                                        <div class="text-sm text-slate-300">%15 oranında kargo gecikmesi şikayeti</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
+                                    <div>
+                                        <div class="font-medium text-amber-400">Müşteri Hizmetleri İletişimi</div>
+                                        <div class="text-sm text-slate-300">İletişim zorlukları hakkında geri bildirimler</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+                                    <div>
+                                        <div class="font-medium text-blue-400">Ürün Açıklamaları</div>
+                                        <div class="text-sm text-slate-300">Bazı ürünlerin açıklamalarının yetersiz olduğu belirtilmiş</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Most Positive Comment -->
+                    <div class="report-card rounded-2xl p-6 expandable-card" data-card="positive">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">En Olumlu Yorum</h3>
+                            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="rating-stars">★★★★★</div>
+                                    <span class="text-sm text-slate-400">Google Reviews - 15.01.2024</span>
+                                </div>
+                                <p class="text-slate-300 italic" id="positive-comment">
+                                    "Harika bir deneyim oldu! Ürün tam olarak tarif edildiği gibiydi ve kargo çok hızlı geldi. 
+                                    Müşteri hizmetleri de çok ilgiliydi. Kesinlikle tekrar alışveriş yapacağım."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Most Negative Comment -->
+                    <div class="report-card rounded-2xl p-6 expandable-card" data-card="negative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">En Olumsuz Yorum</h3>
+                            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="rating-stars" style="color: #EF4444;">★☆☆☆☆</div>
+                                    <span class="text-sm text-slate-400">Trustpilot - 10.01.2024</span>
+                                </div>
+                                <p class="text-slate-300 italic" id="negative-comment">
+                                    "Ürün 1 hafta geç geldi ve kutusu ezikti. Müşteri hizmetleriyle iletişim kurmak çok zordu. 
+                                    Bu kadar kötü bir deneyim beklemiyordum."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Charts and Analytics -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Sentiment Distribution Chart -->
+                    <div class="report-card rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Duygu Dağılımı</h3>
+                        <div class="chart-container" id="sentiment-chart"></div>
+                    </div>
+
+                    <!-- Time Series Chart -->
+                    <div class="report-card rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Yorum Zaman Çizelgesi</h3>
+                        <div class="chart-container" id="timeline-chart"></div>
+                    </div>
+
+                    <!-- Key Topics Cloud -->
+                    <div class="report-card rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Anahtar Konular</h3>
+                        <div class="chart-container" id="topics-chart"></div>
+                    </div>
+
+                    <!-- Suspicious Comments Analysis -->
+                    <div class="report-card rounded-2xl p-6 expandable-card" data-card="suspicious">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Şüpheli Yorum Analizi</h3>
+                            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="metric-card rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-amber-400 mb-1" id="suspicious-count">12</div>
+                                    <div class="text-sm text-slate-300">Şüpheli Yorum</div>
+                                </div>
+                                <div class="metric-card rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-amber-400 mb-1" id="suspicious-percent">0.96%</div>
+                                    <div class="text-sm text-slate-300">Oranı</div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="border-l-4 border-amber-400 pl-4">
+                                    <p class="text-slate-300 italic mb-2" id="suspicious-comment">
+                                        "Çok güzel ürün herkese tavsiye ederim süper kalite harika işçilik mükemmel paketleme."
+                                    </p>
+                                    <div class="text-sm text-amber-400">
+                                        <strong>Şüphe Sebebi:</strong> Aşırı olumlu ifadeler ve tekrarlayan kelimeler
+                                    </div>
+                                    <div class="text-sm text-slate-400 mt-1">
+                                        Güven Skoru: %85 şüpheli
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">ReviewAnalyzer Pro</span>
+                </div>
+                <p class="text-slate-400 mb-4">
+                    © 2024 ReviewAnalyzer Pro. Tüm hakları saklıdır.
+                </p>
+                <p class="text-sm text-slate-500">
+                    Profesyonel yorum analizi ve raporlama platformu
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Analysis page specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAnalysisPage();
+            initializeCharts();
+            initializeInteractions();
+        });
+
+        // Initialize analysis page with data
+        function initializeAnalysisPage() {
+            // Get analysis data from localStorage or use mock data
+            let analysisData = null;
+            try {
+                analysisData = JSON.parse(localStorage.getItem('analysisData'));
+                if (!analysisData) {
+                    analysisData = generateMockAnalysisData();
+                }
+            } catch (e) {
+                console.log('Using mock data due to localStorage error:', e);
+                analysisData = generateMockAnalysisData('example.com');
+            }
+
+            // Update page content with data
+            updateReportContent(analysisData);
+        }
+
+        // Generate mock analysis data
+        function generateMockAnalysisData(url = 'example.com') {
+            const domain = url.includes('.') ? new URL(url.includes('http') ? url : 'https://' + url).hostname.replace('www.', '') : url;
+            
+            return {
+                url: url,
+                domain: domain,
+                analysisDate: new Date().toISOString(),
+                totalComments: Math.floor(Math.random() * 2000) + 500,
+                positiveComments: Math.floor(Math.random() * 1000) + 300,
+                neutralComments: Math.floor(Math.random() * 300) + 100,
+                negativeComments: Math.floor(Math.random() * 200) + 50,
+                suspiciousComments: Math.floor(Math.random() * 50) + 5,
+                overallRating: (Math.random() * 2 + 3).toFixed(1),
+                keyTopics: [
+                    { topic: 'Müşteri Hizmetleri', count: 156, sentiment: 'positive' },
+                    { topic: 'Ürün Kalitesi', count: 134, sentiment: 'positive' },
+                    { topic: 'Kargo Süresi', count: 89, sentiment: 'negative' },
+                    { topic: 'Fiyat Performans', count: 67, sentiment: 'neutral' },
+                    { topic: 'Paketleme', count: 45, sentiment: 'positive' }
+                ],
+                mostPositiveComment: {
+                    text: "Harika bir deneyim oldu! Ürün tam olarak tarif edildiği gibiydi ve kargo çok hızlı geldi. Müşteri hizmetleri de çok ilgiliydi. Kesinlikle tekrar alışveriş yapacağım.",
+                    rating: 5,
+                    platform: 'Google Reviews',
+                    date: '2024-01-15'
+                },
+                mostNegativeComment: {
+                    text: "Ürün 1 hafta geç geldi ve kutusu ezikti. Müşteri hizmetleriyle iletişim kurmak çok zordu. Bu kadar kötü bir deneyim beklemiyordum.",
+                    rating: 1,
+                    platform: 'Trustpilot',
+                    date: '2024-01-10'
+                },
+                suspiciousComment: {
+                    text: "Çok güzel ürün herkese tavsiye ederim süper kalite harika işçilik mükemmel paketleme.",
+                    reason: 'Aşırı olumlu ifadeler ve tekrarlayan kelimeler',
+                    confidence: 85
+                }
+            };
+        }
+
+        // Update report content with analysis data
+        function updateReportContent(data) {
+            // Update header information
+            document.getElementById('report-domain').textContent = data.domain;
+            document.getElementById('report-date').textContent = `Analiz Tarihi: ${new Date(data.analysisDate).toLocaleDateString('tr-TR')}`;
+            
+            // Update overall metrics
+            document.getElementById('overall-score').textContent = data.overallRating;
+            document.getElementById('total-comments').textContent = data.totalComments.toLocaleString();
+            
+            const positiveRate = ((data.positiveComments / data.totalComments) * 100).toFixed(0);
+            document.getElementById('positive-rate').textContent = positiveRate + '%';
+            
+            // Update suspicious comment metrics
+            document.getElementById('suspicious-count').textContent = data.suspiciousComments;
+            const suspiciousPercent = ((data.suspiciousComments / data.totalComments) * 100).toFixed(2);
+            document.getElementById('suspicious-percent').textContent = suspiciousPercent + '%';
+            
+            // Update comment content
+            document.getElementById('positive-comment').textContent = data.mostPositiveComment.text;
+            document.getElementById('negative-comment').textContent = data.mostNegativeComment.text;
+            document.getElementById('suspicious-comment').textContent = data.suspiciousComment.text;
+            
+            // Store data globally for charts
+            window.analysisData = data;
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            setTimeout(() => {
+                createSentimentChart();
+                createTimelineChart();
+                createTopicsChart();
+            }, 500);
+        }
+
+        // Create sentiment distribution chart
+        function createSentimentChart() {
+            const chartDom = document.getElementById('sentiment-chart');
+            const myChart = echarts.init(chartDom);
+            
+            const data = window.analysisData || generateMockAnalysisData();
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: '#1E293B',
+                    borderColor: '#6366F1',
+                    textStyle: { color: '#F8FAFC' }
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    textStyle: { color: '#CBD5E1' }
+                },
+                series: [
+                    {
+                        name: 'Duygu Dağılımı',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: data.positiveComments, name: 'Pozitif', itemStyle: { color: '#10B981' } },
+                            { value: data.neutralComments, name: 'Nötr', itemStyle: { color: '#6B7280' } },
+                            { value: data.negativeComments, name: 'Negatif', itemStyle: { color: '#EF4444' } }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        label: {
+                            color: '#F8FAFC'
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            // Make chart responsive
+            window.addEventListener('resize', () => {
+                myChart.resize();
+            });
+        }
+
+        // Create timeline chart
+        function createTimelineChart() {
+            const chartDom = document.getElementById('timeline-chart');
+            const myChart = echarts.init(chartDom);
+            
+            // Generate mock timeline data
+            const timelineData = [];
+            const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+            
+            months.forEach((month, index) => {
+                timelineData.push([
+                    month,
+                    Math.floor(Math.random() * 200) + 50,
+                    Math.floor(Math.random() * 150) + 30,
+                    Math.floor(Math.random() * 50) + 10
+                ]);
+            });
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#1E293B',
+                    borderColor: '#6366F1',
+                    textStyle: { color: '#F8FAFC' }
+                },
+                legend: {
+                    data: ['Toplam Yorum', 'Pozitif', 'Negatif'],
+                    textStyle: { color: '#CBD5E1' }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: timelineData.map(item => item[0]),
+                    axisLine: { lineStyle: { color: '#475569' } },
+                    axisLabel: { color: '#CBD5E1' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#475569' } },
+                    axisLabel: { color: '#CBD5E1' },
+                    splitLine: { lineStyle: { color: '#374151' } }
+                },
+                series: [
+                    {
+                        name: 'Toplam Yorum',
+                        type: 'line',
+                        data: timelineData.map(item => item[1]),
+                        itemStyle: { color: '#6366F1' },
+                        lineStyle: { color: '#6366F1' }
+                    },
+                    {
+                        name: 'Pozitif',
+                        type: 'line',
+                        data: timelineData.map(item => item[2]),
+                        itemStyle: { color: '#10B981' },
+                        lineStyle: { color: '#10B981' }
+                    },
+                    {
+                        name: 'Negatif',
+                        type: 'line',
+                        data: timelineData.map(item => item[3]),
+                        itemStyle: { color: '#EF4444' },
+                        lineStyle: { color: '#EF4444' }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', () => {
+                myChart.resize();
+            });
+        }
+
+        // Create topics chart
+        function createTopicsChart() {
+            const chartDom = document.getElementById('topics-chart');
+            const myChart = echarts.init(chartDom);
+            
+            const data = window.analysisData || generateMockAnalysisData();
+            
+            const topicsData = data.keyTopics.map(item => ({
+                name: item.topic,
+                value: item.count,
+                sentiment: item.sentiment
+            }));
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: '#1E293B',
+                    borderColor: '#6366F1',
+                    textStyle: { color: '#F8FAFC' }
+                },
+                series: [
+                    {
+                        type: 'wordCloud',
+                        shape: 'circle',
+                        left: 'center',
+                        top: 'center',
+                        width: '90%',
+                        height: '90%',
+                        right: null,
+                        bottom: null,
+                        sizeRange: [12, 40],
+                        rotationRange: [-45, 45],
+                        rotationStep: 15,
+                        gridSize: 8,
+                        drawOutOfBound: false,
+                        textStyle: {
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: function (param) {
+                                const colors = {
+                                    'positive': '#10B981',
+                                    'neutral': '#6B7280',
+                                    'negative': '#EF4444'
+                                };
+                                return colors[param.data.sentiment] || '#6366F1';
+                            }
+                        },
+                        emphasis: {
+                            textStyle: {
+                                shadowBlur: 10,
+                                shadowColor: '#333'
+                            }
+                        },
+                        data: topicsData
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', () => {
+                myChart.resize();
+            });
+        }
+
+        // Initialize interactions
+        function initializeInteractions() {
+            // Expandable cards
+            document.querySelectorAll('.expandable-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const content = this.querySelector('.card-content');
+                    const icon = this.querySelector('.expand-icon');
+                    
+                    if (content.classList.contains('expanded')) {
+                        content.classList.remove('expanded');
+                        this.classList.remove('expanded');
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.classList.add('expanded');
+                        this.classList.add('expanded');
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // PDF export
+            document.getElementById('export-pdf').addEventListener('click', exportToPDF);
+        }
+
+        // Export to PDF function
+        function exportToPDF() {
+            const button = document.getElementById('export-pdf');
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = `
+                <svg class="w-4 h-4 inline mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Hazırlanıyor...
+            `;
+            button.disabled = true;
+
+            // Configure PDF options
+            const opt = {
+                margin: 1,
+                filename: `yorum-analizi-raporu-${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    backgroundColor: '#0F172A',
+                    useCORS: true
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'letter', 
+                    orientation: 'portrait'
+                }
+            };
+
+            // Generate PDF
+            html2pdf().set(opt).from(document.body).save().then(() => {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Show success notification
+                showNotification('PDF raporu başarıyla indirildi!', 'success');
+            }).catch((error) => {
+                console.error('PDF export error:', error);
+                button.innerHTML = originalText;
+                button.disabled = false;
+                showNotification('PDF indirme sırasında bir hata oluştu', 'error');
+            });
+        }
+
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+                type === 'error' ? 'bg-red-600 text-white' : 
+                type === 'success' ? 'bg-green-600 text-white' : 
+                'bg-blue-600 text-white'
+            }`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+            
+            anime({
+                targets: notification,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutQuart'
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewAnalyzer Pro - Yorum Analizi Platformu</title>
+    <meta name="description" content="Ürün ve firma web sitelerinin tüm yorumlarını analiz ederek kapsamlı raporlar oluşturan profesyonel platform">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    
+    <style>
+        :root {
+            --primary: #6366F1;
+            --secondary: #8B5CF6;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --text: #F8FAFC;
+            --text-secondary: #CBD5E1;
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%),
+                        url('https://kimi-web-img.moonshot.cn/img/www.shutterstock.com/e28259d7a10b03e253e93a5be0c69643a08cfe3c.jpg') center/cover;
+            position: relative;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-container {
+            display: none !important;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .typing-cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">ReviewAnalyzer Pro</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-slate-300 hover:text-white transition-colors">Özellikler</a>
+                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">Nasıl Çalışır</a>
+                    <a href="#pricing" class="text-slate-300 hover:text-white transition-colors">Fiyatlandırma</a>
+                    <button class="btn-primary px-6 py-2 rounded-lg text-white font-medium">
+                        Ücretsiz Dene
+                    </button>
+                </div>
+                
+                <div class="md:hidden">
+                    <button class="text-slate-300 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
+        <div class="parallax-layer" id="parallax-layer"></div>
+        
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <h1 class="text-5xl lg:text-6xl font-bold leading-tight">
+                            <span class="block">Web Sitenizin</span>
+                            <span class="block gradient-text" id="typed-text"></span>
+                            <span class="block">Analiz Edin</span>
+                        </h1>
+                        <p class="text-xl text-slate-300 leading-relaxed max-w-2xl">
+                            Ürün veya firmanız hakkında yapılan tüm yorumları toplayın, yapay zeka destekli analiz ile detaylı raporlar oluşturun. Şüpheli yorumları tespit edin, müşteri memnuniyetini artırın.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="glass-card rounded-2xl p-6 space-y-4">
+                            <label class="block text-sm font-medium text-slate-300">
+                                Web Sitesi URL'si
+                            </label>
+                            <div class="flex gap-3">
+                                <input 
+                                    type="url" 
+                                    id="url-input"
+                                    placeholder="https://www.ornek-firma.com"
+                                    class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                />
+                                <button 
+                                    id="analyze-btn"
+                                    class="btn-primary px-8 py-3 rounded-lg text-white font-medium whitespace-nowrap"
+                                >
+                                    Analiz Et
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm text-slate-400">
+                            Hızlı test için: 
+                            <button class="text-indigo-400 hover:text-indigo-300 transition-colors sample-url" data-url="https://www.hepsiburada.com">
+                                Hepsiburada
+                            </button>
+                            • 
+                            <button class="text-indigo-400 hover:text-indigo-300 transition-colors sample-url" data-url="https://www.trendyol.com">
+                                Trendyol
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="floating-element">
+                        <div class="glass-card rounded-3xl p-8 space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Analiz Ön İzlemesi</h3>
+                                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-300">Toplam Yorum</span>
+                                    <span class="text-2xl font-bold text-indigo-400">1,247</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-300">Pozitif Oranı</span>
+                                    <span class="text-2xl font-bold text-green-400">73%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-300">Şüpheli Yorum</span>
+                                    <span class="text-2xl font-bold text-amber-400">12</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-slate-700">
+                                <div class="text-sm text-slate-400 mb-2">Son Analiz</div>
+                                <div class="text-sm text-slate-300">2 saat önce</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Container -->
+        <div class="progress-container fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div class="glass-card rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+                <div class="mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Analiz Başlatılıyor</h3>
+                    <p class="text-slate-400" id="progress-text">URL kontrol ediliyor...</p>
+                </div>
+                
+                <div class="w-full bg-slate-700 rounded-full h-2 mb-4">
+                    <div class="progress-bar bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" id="progress-bar"></div>
+                </div>
+                
+                <div class="text-sm text-slate-400">
+                    <span id="progress-percent">0%</span> tamamlandı
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="gradient-text">Güçlü Analiz Özellikleri</span>
+                </h2>
+                <p class="text-xl text-slate-300 max-w-3xl mx-auto">
+                    Yapay zeka destekli analiz araçlarımız ile müşteri geri bildirimlerini anlamlandırın, işletmenizi geliştirin.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Kapsamlı Yorum Analizi</h3>
+                    <p class="text-slate-300">
+                        Tüm platformlardan yorumları toplayın, duygu analizi yapın ve şüpheli yorumları tespit edin.
+                    </p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Detaylı Raporlar</h3>
+                    <p class="text-slate-300">
+                        Profesyonel PDF raporlar oluşturun, en önemli içgörüleri vurgulayın ve aksiyon planları geliştirin.
+                    </p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Şüpheli Yorum Tespiti</h3>
+                    <p class="text-slate-300">
+                        Yapay zeka algoritmaları ile sahte ve şüpheli yorumları otomatik olarak belirleyin.
+                    </p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Gerçek Zamanlı Takip</h3>
+                    <p class="text-slate-300">
+                        Yeni yorumlar geldiğinde anında bildirim alın, müşteri memnuniyetini sürekli izleyin.
+                    </p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Erişilebilir PDF Raporlar</h3>
+                    <p class="text-slate-300">
+                        Profesyonel tasarımlı, interaktif PDF raporlar oluşturun ve kolayca paylaşın.
+                    </p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 hover-lift">
+                    <div class="feature-icon">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Hedefli İyileştirme</h3>
+                    <p class="text-slate-300">
+                        Analiz sonuçlarına göre özel öneriler alın, işletmenizi daha verimli yönetin.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="gradient-text">3 Basit Adımda Analiz</span>
+                </h2>
+                <p class="text-xl text-slate-300 max-w-3xl mx-auto">
+                    Karmaşık analizleri basitleştirdik. Sadece URL girin, gerisini biz halledelim.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-white">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">URL Girişi</h3>
+                    <p class="text-slate-300">
+                        Analiz etmek istediğiniz web sitesinin URL'sini girin. Sistem otomatik olarak tüm yorum platformlarını tarar.
+                    </p>
+                </div>
+                
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-white">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">Yapay Zeka Analizi</h3>
+                    <p class="text-slate-300">
+                        Gelişmiş AI algoritmalarımız yorumları analiz eder, duygu durumlarını belirler ve şüpheli içerikleri tespit eder.
+                    </p>
+                </div>
+                
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-white">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">Detaylı Rapor</h3>
+                    <p class="text-slate-300">
+                        Profesyonel PDF raporunuz hazır! Tüm içgörüler, öneriler ve analiz sonuçları tek bir dokümanda.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">ReviewAnalyzer Pro</span>
+                </div>
+                <p class="text-slate-400 mb-4">
+                    © 2024 ReviewAnalyzer Pro. Tüm hakları saklıdır.
+                </p>
+                <p class="text-sm text-slate-500">
+                    Profesyonel yorum analizi ve raporlama platformu
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
