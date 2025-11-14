@@ -171,30 +171,41 @@
                 </div>
                 
                 <div class="md:hidden">
-                    <button class="text-slate-300 hover:text-white">
+                    <button id="mobile-menu-button" class="text-slate-300 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                         </svg>
                     </button>
                 </div>
             </div>
         </div>
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#features" class="text-slate-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Özellikler</a>
+                <a href="#how-it-works" class="text-slate-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nasıl Çalışır</a>
+                <a href="#pricing" class="text-slate-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Fiyatlandırma</a>
+                <button class="w-full text-left bg-indigo-600 text-white block px-3 py-2 rounded-md text-base font-medium">
+                    Ücretsiz Dene
+                </button>
+            </div>
+        </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
+    <section class="hero-bg min-h-screen flex items-center relative overflow-hidden pt-16">
         <div class="parallax-layer" id="parallax-layer"></div>
         
-        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center md:text-left">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-8">
                     <div class="space-y-4">
-                        <h1 class="text-5xl lg:text-6xl font-bold leading-tight">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                             <span class="block">Web Sitenizin</span>
                             <span class="block gradient-text" id="typed-text"></span>
                             <span class="block">Analiz Edin</span>
                         </h1>
-                        <p class="text-xl text-slate-300 leading-relaxed max-w-2xl">
+                        <p class="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto md:mx-0">
                             Ürün veya firmanız hakkında yapılan tüm yorumları toplayın, yapay zeka destekli analiz ile detaylı raporlar oluşturun. Şüpheli yorumları tespit edin, müşteri memnuniyetini artırın.
                         </p>
                     </div>
@@ -204,7 +215,7 @@
                             <label class="block text-sm font-medium text-slate-300">
                                 Web Sitesi URL'si
                             </label>
-                            <div class="flex gap-3">
+                            <div class="flex flex-col sm:flex-row gap-3">
                                 <input 
                                     type="url" 
                                     id="url-input"
@@ -233,7 +244,7 @@
                     </div>
                 </div>
                 
-                <div class="relative">
+                <div class="relative hidden lg:block">
                     <div class="floating-element">
                         <div class="glass-card rounded-3xl p-8 space-y-6">
                             <div class="flex items-center justify-between">
