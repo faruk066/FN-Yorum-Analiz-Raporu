@@ -157,28 +157,28 @@
     <section class="pt-24 pb-12 bg-slate-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold mb-4">
+                <h1 class="text-3xl sm:text-4xl font-bold mb-4">
                     <span class="gradient-text">Analiz Raporu</span>
                 </h1>
-                <p class="text-xl text-slate-300" id="report-domain">example.com</p>
+                <p class="text-lg sm:text-xl text-slate-300" id="report-domain">example.com</p>
                 <p class="text-sm text-slate-400 mt-2" id="report-date">Analiz Tarihi: 10.11.2024</p>
             </div>
             
             <!-- Overall Score -->
-            <div class="glass-card rounded-2xl p-8 text-center mb-8">
-                <div class="flex items-center justify-center space-x-8">
+            <div class="glass-card rounded-2xl p-6 sm:p-8 text-center mb-8">
+                <div class="flex flex-col sm:flex-row items-center justify-center sm:space-x-8 space-y-4 sm:space-y-0">
                     <div>
-                        <div class="text-5xl font-bold gradient-text mb-2" id="overall-score">4.2</div>
+                        <div class="text-4xl sm:text-5xl font-bold gradient-text mb-2" id="overall-score">4.2</div>
                         <div class="text-slate-300">Genel Puan</div>
                     </div>
-                    <div class="h-16 w-px bg-slate-600"></div>
+                    <div class="h-px sm:h-16 w-16 sm:w-px bg-slate-600"></div>
                     <div>
-                        <div class="text-3xl font-bold text-indigo-400 mb-2" id="total-comments">1,247</div>
+                        <div class="text-2xl sm:text-3xl font-bold text-indigo-400 mb-2" id="total-comments">1,247</div>
                         <div class="text-slate-300">Toplam Yorum</div>
                     </div>
-                    <div class="h-16 w-px bg-slate-600"></div>
+                    <div class="h-px sm:h-16 w-16 sm:w-px bg-slate-600"></div>
                     <div>
-                        <div class="text-3xl font-bold text-green-400 mb-2" id="positive-rate">73%</div>
+                        <div class="text-2xl sm:text-3xl font-bold text-green-400 mb-2" id="positive-rate">73%</div>
                         <div class="text-slate-300">Pozitif Oranı</div>
                     </div>
                 </div>
@@ -189,10 +189,10 @@
     <!-- Main Content -->
     <section class="pb-20 bg-slate-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- Left Column - Key Metrics -->
-                <div class="space-y-6">
+                <div class="lg:col-span-1 space-y-6">
                     <!-- Summary Card -->
                     <div class="report-card rounded-2xl p-6 expandable-card" data-card="summary">
                         <div class="flex items-center justify-between mb-4">

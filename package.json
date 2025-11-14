@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faruk066/FN-Yorum-Analiz-Raporu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/faruk066/FN-Yorum-Analiz-Raporu/issues"
+  },
+  "homepage": "https://github.com/faruk066/FN-Yorum-Analiz-Raporu#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "puppeteer": "^24.30.0"
+  }
+}
